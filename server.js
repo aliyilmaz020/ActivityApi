@@ -4,6 +4,7 @@ const Events = require('./models/eventsModel')
 const app = express()
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
 //routes
 app.get('/api/v1', (req, res) => {
@@ -47,13 +48,15 @@ app.put('/api/v1/events/:id', async (req, res) => {
     if (!event) {
       return res.status(404).json({ message: 'Cannot find any event with ID ${id}' });
     }
-    res.status(200).json(event);
+    const updatedEvents = await Events.findById(id);
+    res.status(200).json(updatedEvents);
 
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message })
   }
 })
+
 
 mongoose.
   connect('mongodb+srv://admin:123456789admin@activityapi.3zsqozn.mongodb.net/Node-API?retryWrites=true&w=majority')
