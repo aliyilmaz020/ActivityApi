@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express')
 const mongoose = require('mongoose')
 const Events = require('./models/eventsModel')
@@ -57,9 +58,22 @@ app.put('/api/v1/events/:id', async (req, res) => {
   }
 })
 
+app.delete('/api/v1/events/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const event = await Events.findByIdAndDelete(id);
+    if (!event) {
+      return res.status(404).json({ message: 'Cannot find any event with ID ${id}' });
+    }
+    res.status(200).json(event);
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
 
+const mongoURI = process.env.MONGODB_URI;
 mongoose.
-  connect('mongodb+srv://admin:123456789admin@activityapi.3zsqozn.mongodb.net/Node-API?retryWrites=true&w=majority')
+  connect(mongoURI)
   .then(() => {
     console.log('Connected to MongoDB ')
     app.listen(3000, () => {
